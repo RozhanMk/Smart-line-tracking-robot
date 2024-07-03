@@ -5,10 +5,11 @@
 #define RIGHTENC 3 //interrupt
 #define IN1 9
 #define IN2 8
-#define IN3 8
-#define IN4 8
+#define IN3 7
+#define IN4 6
 #define ENB1 10
 #define ENB2 11
+#define USONIC 4
 #define LEFTSENSOR A0
 #define CenterSENSOR A1
 #define RIGHTSENSOR A2
@@ -16,6 +17,7 @@
 void timerISR();
 void leftEncoderISR();
 void rightEncoderISR();
+long readUltrasonicDistance();
 void goForward();
 void turnRight();
 void turnLeft();
@@ -65,6 +67,8 @@ void setup() {
     pinMode(CenterSENSOR, INPUT);
     pinMode(RIGHTSENSOR, INPUT);
 
+    pinMode(USONIC, OUTPUT);
+
     Timer1.initialize(interval);
     Timer1.attachInterrupt(timerISR);
 
@@ -76,18 +80,25 @@ void loop() {
     int centerValue = analogRead(CenterSENSOR);
     int rightValue = analogRead(RIGHTSENSOR);
 
-    //line tracker
-    if (centerValue > 500) { //center sensor On line
-        goForward();
-    }
-    else if (leftValue > 500) { //left sensor on line
-        turnLeft();
-    }
-    else if (rightValue > 500) { //right sensor on line
-        turnRight();
-    }
-    else { //stop
+    long distance = readUltrasonicDistance();
+
+    if (distance < 10) {    //10cm
         stopMotors();
+    }
+    else{
+        //line tracker
+        if (centerValue > 500) { //center sensor On line
+            goForward();
+        }
+        else if (leftValue > 500) { //left sensor on line
+            turnLeft();
+        }
+        else if (rightValue > 500) { //right sensor on line
+            turnRight();
+        }
+        else { //stop
+            stopMotors();
+        }
     }
 
     delay(10);
@@ -116,6 +127,21 @@ void leftEncoderISR() {
 
 void rightEncoderISR() {
   rightCount++;
+}
+
+long readUltrasonicDistance() {
+    pinMode(USONIC, OUTPUT);
+    digitalWrite(USONIC, LOW);
+    delayMicroseconds(2);
+    digitalWrite(USONIC, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(USONIC, LOW);
+
+    pinMode(USONIC, INPUT);
+    long duration = pulseIn(USONIC, HIGH);
+    long distance = duration * 0.034 / 2;
+
+    return distance;
 }
 
 void goForward() {
