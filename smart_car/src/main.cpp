@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <PID_v1.h>
 #include <TimerOne.h>
+#include <LiquidCrystal_I2C.h>
 #define LEFTENC 2 //interrupt
 #define RIGHTENC 3 //interrupt
 #define IN1 9
@@ -10,6 +11,7 @@
 #define ENB1 10
 #define ENB2 11
 #define USONIC 4
+#define ALERT_LED 12
 #define LEFTSENSOR A0
 #define CenterSENSOR A1
 #define RIGHTSENSOR A2
@@ -18,6 +20,7 @@ void timerISR();
 void leftEncoderISR();
 void rightEncoderISR();
 long readDistance();
+void decreaseEnergy();
 void goForward();
 void turnRight();
 void turnLeft();
@@ -38,6 +41,9 @@ PID leftPID(&leftInput, &leftOutput, &setPoint, Kp, Ki, Kd, DIRECT);
 double rightInput, rightOutput;   //right motor
 PID rightPID(&rightInput, &rightOutput, &setPoint, Kp, Ki, Kd, DIRECT);
 
+double machineEnergy = 100.0;  //initial energy level
+LiquidCrystal_I2C lcd(0x27,20,4);
+long prevEnergyUpdateTime = 0;
 
 void setup() {
     /****Motor drivers setup***/
@@ -68,6 +74,11 @@ void setup() {
     pinMode(RIGHTSENSOR, INPUT);
 
     pinMode(USONIC, OUTPUT);
+
+    pinMode(ALERT_LED, OUTPUT);
+
+    lcd.init();                     
+    lcd.backlight();
 
     Timer1.initialize(interval);
     Timer1.attachInterrupt(timerISR);
@@ -100,6 +111,21 @@ void loop() {
             stopMotors();
         }
     }
+
+    long currentTime = millis();
+    if(currentTime - prevEnergyUpdateTime >= 1000) {
+        decreaseEnergy();
+        prevEnergyUpdateTime = currentTime;
+    }
+    if(machineEnergy <= 15){    // low charge
+        digitalWrite(ALERT_LED, HIGH);
+    }
+
+    //display energy on lcd
+    lcd.setCursor(0, 0);
+    lcd.print("Energy: ");
+    lcd.print(machineEnergy);
+    lcd.print("%");
 
     delay(10);
 }
@@ -142,6 +168,15 @@ long readDistance() {
     long distance = duration * 0.034 / 2;
 
     return distance;
+}
+
+void decreaseEnergy() {
+    float decreaseRate = 0.1; 
+    machineEnergy -= decreaseRate;
+
+    if(machineEnergy < 0) {
+        machineEnergy = 0;
+    }
 }
 
 void goForward() {
