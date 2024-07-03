@@ -62,6 +62,7 @@ void setup() {
     Timer1.attachInterrupt(timerISR);
 
     Serial.begin(9600);
+    
 }
 
 void loop() {

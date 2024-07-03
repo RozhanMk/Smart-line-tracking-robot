@@ -14,6 +14,8 @@
 #define CenterSENSOR A1
 #define RIGHTSENSOR A2
 
+extern double machineEnergy;
+
 void timerISR();
 void leftEncoderISR();
 void rightEncoderISR();
