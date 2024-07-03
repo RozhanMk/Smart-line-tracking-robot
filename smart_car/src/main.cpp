@@ -17,7 +17,7 @@
 void timerISR();
 void leftEncoderISR();
 void rightEncoderISR();
-long readUltrasonicDistance();
+long readDistance();
 void goForward();
 void turnRight();
 void turnLeft();
@@ -80,7 +80,7 @@ void loop() {
     int centerValue = analogRead(CenterSENSOR);
     int rightValue = analogRead(RIGHTSENSOR);
 
-    long distance = readUltrasonicDistance();
+    long distance = readDistance();
 
     if (distance < 10) {    //10cm
         stopMotors();
@@ -129,7 +129,7 @@ void rightEncoderISR() {
   rightCount++;
 }
 
-long readUltrasonicDistance() {
+long readDistance() {
     pinMode(USONIC, OUTPUT);
     digitalWrite(USONIC, LOW);
     delayMicroseconds(2);
