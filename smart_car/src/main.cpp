@@ -72,7 +72,7 @@ void loop() {
 
     long distance = readDistance();
 
-    if (distance < 10) {    //10cm
+    if (distance < 30) {    //30cm
         stopMotors();
     }
     else{
