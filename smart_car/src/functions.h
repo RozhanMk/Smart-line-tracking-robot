@@ -13,6 +13,8 @@
 #define LEFTSENSOR A0
 #define CenterSENSOR A1
 #define RIGHTSENSOR A2
+#define LIGHT_SENSOR A3
+#define CAR_LIGHT 13
 
 extern double machineEnergy;
 
@@ -25,5 +27,6 @@ void goForward();
 void turnRight();
 void turnLeft();
 void stopMotors();
+void updateCarLight();
 
 #endif

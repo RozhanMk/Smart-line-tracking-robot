@@ -2,6 +2,7 @@
 #include <Arduino.h>
 #include <PID_v1.h>
 #include <LiquidCrystal_I2C.h>
+#include <Arduino_FreeRTOS.h>
 
 double interval = 100000; //100ms
 
@@ -18,7 +19,7 @@ PID leftPID(&leftInput, &leftOutput, &setPoint, Kp, Ki, Kd, DIRECT);
 double rightInput, rightOutput;   //right motor
 PID rightPID(&rightInput, &rightOutput, &setPoint, Kp, Ki, Kd, DIRECT);
 
-double machineEnergy = 100.0;  //initial energy level
+int machineEnergy = 100;  //initial energy level
 LiquidCrystal_I2C lcd(0x27,20,4);
 long prevEnergyUpdateTime = 0;
 long prevSpeedUpdateTime = 0;
@@ -31,6 +32,8 @@ void setup() {
     pinMode(IN4, OUTPUT);
     pinMode(ENB1, OUTPUT);
     pinMode(ENB2, OUTPUT);
+    pinMode(LIGHT_SENSOR, INPUT);
+    pinMode(CAR_LIGHT, OUTPUT);
     analogWrite(ENB1, 255); // turn on
     analogWrite(ENB2, 255); // turn on
 
@@ -109,6 +112,8 @@ void loop() {
     lcd.print(machineEnergy);
     lcd.print("%");
 
+    updateCarLight();
+
     delay(10);
 }
 
@@ -153,7 +158,7 @@ long readDistance() {
 }
 
 void decreaseEnergy() {
-    float decreaseRate = 0.1; 
+    int decreaseRate = 1; 
     machineEnergy -= decreaseRate;
 
     if(machineEnergy < 0) {
@@ -187,4 +192,18 @@ void stopMotors() {
     digitalWrite(IN2, LOW);
     digitalWrite(IN3, LOW);
     digitalWrite(IN4, LOW);
+}
+
+float fMap(float x, float in_min, float in_max, float out_min, float out_max) {
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
+void updateCarLight() {
+    float outsideLight = analogRead(LIGHT_SENSOR);
+    float carLightVoltage = 255 - fMap(outsideLight, 6, 679, 0, 255);
+    Serial.print("Outside Light: ");
+    Serial.println(outsideLight);
+    Serial.print("Car Light Voltage: ");
+    Serial.println(carLightVoltage);
+    analogWrite(CAR_LIGHT, carLightVoltage);
 }
