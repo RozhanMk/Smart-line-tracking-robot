@@ -16,7 +16,7 @@
 #define LIGHT_SENSOR A3
 #define CAR_LIGHT 13
 
-extern double machineEnergy;
+extern int machineEnergy;
 
 void updateSpeed();
 void leftEncoderISR();
@@ -28,5 +28,6 @@ void turnRight();
 void turnLeft();
 void stopMotors();
 void updateCarLight();
+float fMap(float, float, float, float, float);
 
 #endif
