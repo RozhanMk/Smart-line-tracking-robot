@@ -16,7 +16,7 @@
 
 extern double machineEnergy;
 
-void timerISR();
+void updateSpeed();
 void leftEncoderISR();
 void rightEncoderISR();
 long readDistance();

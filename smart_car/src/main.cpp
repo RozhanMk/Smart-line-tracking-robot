@@ -1,7 +1,6 @@
 #include "functions.h"
 #include <Arduino.h>
 #include <PID_v1.h>
-#include <TimerOne.h>
 #include <LiquidCrystal_I2C.h>
 
 double interval = 100000; //100ms
@@ -22,6 +21,7 @@ PID rightPID(&rightInput, &rightOutput, &setPoint, Kp, Ki, Kd, DIRECT);
 double machineEnergy = 100.0;  //initial energy level
 LiquidCrystal_I2C lcd(0x27,20,4);
 long prevEnergyUpdateTime = 0;
+long prevSpeedUpdateTime = 0;
 
 void setup() {
     /****Motor drivers setup***/
@@ -58,9 +58,6 @@ void setup() {
     lcd.init();                     
     lcd.backlight();
 
-    Timer1.initialize(interval);
-    Timer1.attachInterrupt(timerISR);
-
     Serial.begin(9600);
     
 }
@@ -92,6 +89,12 @@ void loop() {
     }
 
     long currentTime = millis();
+    if(currentTime - prevSpeedUpdateTime >= 100) {
+        updateSpeed();
+        prevSpeedUpdateTime = currentTime;
+    }
+
+    currentTime = millis();
     if(currentTime - prevEnergyUpdateTime >= 1000) {
         decreaseEnergy();
         prevEnergyUpdateTime = currentTime;
@@ -109,7 +112,7 @@ void loop() {
     delay(10);
 }
 
-void timerISR(){
+void updateSpeed(){
     //calculate speed
     leftInput = (leftCount * (1000.0 / (interval / 1000.0)));
     rightInput = (rightCount * (1000.0 / (interval / 1000.0)));
