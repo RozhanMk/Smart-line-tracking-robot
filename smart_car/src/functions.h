@@ -15,6 +15,7 @@
 #define RIGHTSENSOR A2
 #define LIGHT_SENSOR A3
 #define CAR_LIGHT 13
+#define TILT_SENSOR 5
 
 extern double machineEnergy;
 

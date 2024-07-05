@@ -3,6 +3,8 @@
 #include <PID_v1.h>
 #include <LiquidCrystal_I2C.h>
 
+double tilt = 0;
+
 double interval = 100000; //100ms
 
 volatile long leftCount = 0;    //left encoder
@@ -33,6 +35,7 @@ void setup() {
     pinMode(ENB2, OUTPUT);
     pinMode(LIGHT_SENSOR, INPUT);
     pinMode(CAR_LIGHT, OUTPUT);
+    pinMode(TILT_SENSOR, INPUT);
     analogWrite(ENB1, 255); // turn on
     analogWrite(ENB2, 255); // turn on
 
@@ -111,7 +114,7 @@ void loop() {
     lcd.print(machineEnergy);
     lcd.print("%");
 
-    updateCarLight();
+    checkEnvironment();
 
     delay(10);
 }
@@ -197,12 +200,31 @@ float fMap(float x, float in_min, float in_max, float out_min, float out_max) {
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
-void updateCarLight() {
+float readOutsideLight() {
     float outsideLight = analogRead(LIGHT_SENSOR);
-    float carLightVoltage = 255 - fMap(outsideLight, 6, 679, 0, 255);
     Serial.print("Outside Light: ");
     Serial.println(outsideLight);
+
+    return outsideLight;
+}
+
+void updateCarLight() {
+    float outsideLight = readOutsideLight();
+    float carLightVoltage = 255 - fMap(outsideLight, 6, 679, 0, 255);
+
     Serial.print("Car Light Voltage: ");
     Serial.println(carLightVoltage);
+
     analogWrite(CAR_LIGHT, carLightVoltage);
+}
+
+void readTilt() {
+    tilt = digitalRead(TILT_SENSOR);
+    Serial.print("Tilt: ");
+    Serial.println(tilt);
+}
+
+void checkEnvironment() {
+    updateCarLight();
+    readTilt();
 }
