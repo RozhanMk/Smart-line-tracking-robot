@@ -12,49 +12,41 @@
 #define LEFTSENSOR A0
 #define CenterSENSOR A1
 #define RIGHTSENSOR A2
+#define LIGHT_SENSOR A3
+#define CAR_LIGHT 13
 
-#define assert(condition) customAssert(condition, __func__)
-
-void customAssert(bool condition, const char* function_name) {
-    if (!condition) {
-        Serial.print("Assertion failed in ");
-        Serial.println(function_name);
-        while (true) {
-        }
-    }
+float fMap(float x, float in_min, float in_max, float out_min, float out_max) {
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
-long readDistance() {
-    pinMode(USONIC, OUTPUT);
-    digitalWrite(USONIC, LOW);
-    delayMicroseconds(2);
-    digitalWrite(USONIC, HIGH);
-    delayMicroseconds(10);
-    digitalWrite(USONIC, LOW);
-
-    pinMode(USONIC, INPUT);
-    long duration = pulseIn(USONIC, HIGH);
-    long distance = duration * 0.034 / 2;
-
-    return distance;
+void updateCarLight() {
+    float outsideLight = analogRead(LIGHT_SENSOR);
+    float carLightVoltage = 255 - fMap(outsideLight, 6, 679, 0, 255);
+    Serial.print("Outside Light: ");
+    Serial.println(outsideLight);
+    Serial.print("Car Light Voltage: ");
+    Serial.println(carLightVoltage);
+    analogWrite(CAR_LIGHT, carLightVoltage);
 }
 
 void setup() {
     Serial.begin(9600);
-  
-  	pinMode(IN1, OUTPUT);
+
+    /****Motor drivers setup***/
+    pinMode(IN1, OUTPUT);
     pinMode(IN2, OUTPUT);
     pinMode(IN3, OUTPUT);
     pinMode(IN4, OUTPUT);
     pinMode(ENB1, OUTPUT);
     pinMode(ENB2, OUTPUT);
+    pinMode(LIGHT_SENSOR, INPUT);
+    pinMode(CAR_LIGHT, OUTPUT);
     analogWrite(ENB1, 255); // turn on
     analogWrite(ENB2, 255); // turn on
   
 }
 
-void loop(){
-    long distance = readDistance();
-    Serial.println(distance);
-    delay(200);
+void loop() {
+  updateCarLight();
+  delay(200);
 }
