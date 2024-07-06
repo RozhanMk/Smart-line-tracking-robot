@@ -2,6 +2,7 @@
 #include <Arduino.h>
 #include <PID_v1.h>
 #include <LiquidCrystal_I2C.h>
+#include <Arduino_FreeRTOS.h>
 
 double tilt = 0;
 
@@ -20,7 +21,7 @@ PID leftPID(&leftInput, &leftOutput, &setPoint, Kp, Ki, Kd, DIRECT);
 double rightInput, rightOutput;   //right motor
 PID rightPID(&rightInput, &rightOutput, &setPoint, Kp, Ki, Kd, DIRECT);
 
-double machineEnergy = 100.0;  //initial energy level
+int machineEnergy = 100;  //initial energy level
 LiquidCrystal_I2C lcd(0x27,20,4);
 long prevEnergyUpdateTime = 0;
 long prevSpeedUpdateTime = 0;
@@ -113,7 +114,7 @@ void loop() {
     lcd.print("Energy: ");
     lcd.print(machineEnergy);
     lcd.print("%");
-
+  
     checkEnvironment();
 
     delay(10);
@@ -160,7 +161,7 @@ long readDistance() {
 }
 
 void decreaseEnergy() {
-    float decreaseRate = 0.1; 
+    int decreaseRate = 1; 
     machineEnergy -= decreaseRate;
 
     if(machineEnergy < 0) {
@@ -227,4 +228,3 @@ void readTilt() {
 void checkEnvironment() {
     updateCarLight();
     readTilt();
-}

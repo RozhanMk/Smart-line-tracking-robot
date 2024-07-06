@@ -17,7 +17,7 @@
 #define CAR_LIGHT 13
 #define TILT_SENSOR 5
 
-extern double machineEnergy;
+extern int machineEnergy;
 
 void updateSpeed();
 void leftEncoderISR();
@@ -28,5 +28,7 @@ void goForward();
 void turnRight();
 void turnLeft();
 void stopMotors();
+void updateCarLight();
+float fMap(float, float, float, float, float);
 
 #endif

@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #define LEFTENC 2 //interrupt
 #define RIGHTENC 3 //interrupt
 #define IN1 9
@@ -30,7 +31,7 @@ void updateCarLight() {
 
 void setup() {
     Serial.begin(9600);
-  
+
     /****Motor drivers setup***/
     pinMode(IN1, OUTPUT);
     pinMode(IN2, OUTPUT);
