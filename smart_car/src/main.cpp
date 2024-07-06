@@ -2,7 +2,6 @@
 #include <Arduino.h>
 #include <PID_v1.h>
 #include <LiquidCrystal_I2C.h>
-#include <Arduino_FreeRTOS.h>
 
 double interval = 100000; //100ms
 

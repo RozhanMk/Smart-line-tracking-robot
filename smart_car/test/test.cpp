@@ -36,15 +36,28 @@ void test_motorMovement() {
     assert(digitalRead(IN3) == LOW);
     assert(digitalRead(IN4) == LOW);
 }
+void test_IRSensors(){
+    int leftValue = analogRead(LEFTSENSOR);
+    int centerValue = analogRead(CenterSENSOR);
+    int rightValue = analogRead(RIGHTSENSOR);
+    Serial.println("left:");
+    Serial.println(leftValue);
+
+    Serial.println("center:");
+    Serial.println(centerValue);
+
+    Serial.println("right:");
+    Serial.println(rightValue);
+}
 void test_energyManagement() {
-    machineEnergy = 100.0;
+    machineEnergy = 100;
     
     decreaseEnergy();
-    assert(machineEnergy == 99.9);  //check if energy decreased correctly
+    assert(machineEnergy == 99);  //check if energy decreased correctly
 
-    machineEnergy = 0.0;
+    machineEnergy = 0;
     decreaseEnergy();
-    assert(machineEnergy == 0.0);  
+    assert(machineEnergy == 0);  
 }
 
 void test_distanceSensor() {
