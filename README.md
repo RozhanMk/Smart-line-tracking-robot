@@ -5,7 +5,7 @@ Implementation of a smart line-tracking robot with the following features:
 - Tilt sensor
 - PID speed control
 
-You can also read more in the report file.
+You can also read more in the [report file](/EMB-Final%20Project-Report.pdf).
 
 ## Modeling
 ![image](https://github.com/user-attachments/assets/7f6cf4f8-555f-47de-ac49-5bead78a4f26)
